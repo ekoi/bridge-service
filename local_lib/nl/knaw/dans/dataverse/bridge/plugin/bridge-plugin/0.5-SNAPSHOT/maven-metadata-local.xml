@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>nl.knaw.dans.dataverse.bridge.plugin</groupId>
+  <artifactId>bridge-plugin</artifactId>
+  <version>0.5-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
+    <lastUpdated>20180828135513</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>0.5-SNAPSHOT</value>
+        <updated>20180828135513</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>0.5-SNAPSHOT</value>
+        <updated>20180828135513</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>jar-with-dependencies</classifier>
+        <extension>jar</extension>
+        <value>0.5-SNAPSHOT</value>
+        <updated>20180828135509</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>

@@ -1,0 +1,424 @@
+swagger: "2.0"
+info:
+  version: "0.5.0"
+  title: "Dataverse Bridge to Digital Archive Repository (DAR)"
+  description: "A bridge for Archiving Dataverse dataset to Digital Archive Repository (DAR) via the SWORD v2.0 protocol."
+  contact:
+    email: "eko.indarto@dans.knaw.nl"
+host: "localhost:8592"
+basePath: "/api"
+tags:
+- name: "Archiving"
+  description: "Archiving-related operation"
+- name: "Plugins"
+  description: "A plugin of DAR"
+- name: 'DAR IRI'
+  description: "Digital Archive Repository Configuration"
+- name: "Archiving Auditlog"
+  description: "The dataverse bridge auditlog records"
+schemes:
+- "http"
+produces:
+  - application/json
+paths:
+  /archiving:
+    post:
+      tags:
+      - "Archiving"
+      summary: "Operation to Ingest dataset to DAR"
+      description: "Ingest dataset to DAR"
+      operationId: "ingestToDar"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "ingestData"
+        description: "Dataset object that needs to be added to the Archived's table."
+        required: true
+        schema:
+          $ref: '#/definitions/IngestData'
+      responses:
+        '201':
+          description: Dataset succesfully created.
+          schema:
+            $ref: '#/definitions/Archiving'
+        '400':
+          description: Dataset couldn't have been created.
+        '405':
+          description: "Invalid input"
+    put:
+      tags:
+      - Archiving
+      summary: Re-ingest dataset
+      description: Re-ingest the existing dataset. This only can be done for an archive that has IN-PROGRESS state.
+      operationId: reIngestToDar
+      produces:
+      - application/json
+      parameters:
+        - in: body
+          name: archivingAuditlog
+          description: Updated archive object
+          required: true
+          schema:
+            $ref: '#/definitions/Archiving'
+      responses:
+        200:
+          description: "Dataset is archived"
+        400:
+          description: Invalid id supplied
+        404:
+          description: Archived not found
+
+  /archiving/state:
+    get:
+      tags:
+      - "Archiving"
+      summary: "Operation to retrive a state of an Archived dataset"
+      description: "Operation to retrive a state of an archiving dataset by filtering pid, version, dar target."
+      operationId: "getArchivingState"
+      produces:
+      - application/json
+      parameters:
+      - in: "query"
+        name: "srcMetadataXml"
+        required: true
+        type: string
+      - in: "query"
+        name: "srcMetadataVersion"
+        required: true
+        type: string
+      - in: "query"
+        name: "targetDarName"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Plugin response
+          schema:
+            $ref: '#/definitions/Archiving'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /auditlog/get-all:
+    get:
+      tags:
+      - "Archiving Auditlog"
+      summary: "Operation to retrive all Archived datasets"
+      description: "Operation to retrive all Archived datasets"
+      operationId: "getAll"
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Plugin response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Archiving'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /auditlog/{id}:
+    get:
+      tags:
+      - "Archiving Auditlog"
+      operationId: "getById"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "Record id"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        200:
+         description: Record Id to search
+         schema:
+           $ref: '#/definitions/Archiving'
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Record not found"
+    delete:
+      tags:
+        - "Archiving Auditlog"
+      summary: "Deletes a record"
+      description: ""
+      operationId: "deleteById"
+      parameters:
+        - name: "api_key"
+          in: "header"
+          required: true
+          type: "string"
+        - name: "id"
+          in: "path"
+          description: "Record id to delete"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        200:
+          description: "Record is deleted"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Record not found"
+  /auditlog/delete-all:
+    delete:
+      tags:
+        - "Archiving Auditlog"
+      summary: "Delete all records"
+      description: "Delete all existing records"
+      operationId: "deleteAll"
+      parameters:
+        - name: "api_key"
+          in: "header"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Record is deleted"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Record not found"
+
+  /auditlog/delete/{state}:
+    delete:
+      tags:
+        - "Archiving Auditlog"
+      summary: "Delete records filtered by its state"
+      description: "Delete records filtered by its state"
+      operationId: "deleteFilteredByState"
+      parameters:
+        - name: "api_key"
+          in: "header"
+          required: true
+          type: "string"
+        - name: "state"
+          in: "path"
+          description: "Record id to delete"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        200:
+          description: "Record is deleted"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Record not found"
+
+  /dar:
+    post:
+      tags:
+      - "DAR IRI"
+      summary: "Operation to create a new DAR IRI"
+      description: "Add a new DAR IRI"
+      operationId: "addDarIri"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "darNameAndIri"
+        description: "DAR IRI that needs to be added."
+        required: true
+        schema:
+          $ref: '#/definitions/DarIri'
+      responses:
+        '201':
+          description: DarIri succesfully created.
+        '400':
+          description: DarIri couldn't have been created.
+        '405':
+          description: "Invalid input"
+  /dar/get-all:
+    get:
+      tags:
+      - "DAR IRI"
+      summary: "Operation to retrive all DAR Configuration"
+      description: "Operation to retrive all DAR IRI "
+      operationId: "getAllDarIri"
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Plugin response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/DarIri'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /plugin/get-all:
+    get:
+      tags:
+      - "Plugins"
+      summary: "List of plugins"
+      description: "List of plugins"
+      operationId: "getAllPlugins"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "List of plugins"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Plugin'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /plugin/{dar-name}:
+    post:
+      tags:
+      - "Plugins"
+      summary: "Uploads plugin"
+      description: "Add a new plugin"
+      operationId: "uploadPlugin"
+      consumes:
+      - multipart/form-data
+      produces:
+      - "application/json"
+      parameters:
+        - in: formData
+          name: zipPlugin
+          type: file
+          required: true
+          description: The zip-plugin to upload.
+        - in: path
+          name: dar-name
+          type: string
+          required: true
+      responses:
+        '201':
+          description: New Plugin succesfully created.
+        '400':
+          description: New Plugin couldn't have been created.
+        '405':
+          description: "Invalid input"
+
+definitions:
+
+  Archiving:
+    required:
+      - srcXml
+      - targetIri
+    properties:
+      id:
+        type: integer
+        format: int64
+      srcXml:
+        type: string
+      srcVersion:
+        type: string
+      targetIri:
+        type: string
+      pid:
+        type: string
+      startTime:
+        type: string
+        format: date
+      endTime:
+        type: string
+        format: date
+      landingPage:
+        type: string
+      state:
+        type: string
+        enum:
+          - IN-PROGRESS
+          - FAILED
+          - ARCHIVED
+
+  SrcData:
+    required:
+      - srcXml
+      - srcVersion
+    properties:
+      srcXml:
+        type: string
+        description: exported xml link
+      srcVersion:
+        type: string
+      #appName:
+      #  type: string
+      apiToken:
+        type: string
+        description: Api Token is optional
+
+  DarData:
+    required:
+      - username
+      - iri
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+      darName:
+        type: string
+
+  IngestData:
+    required:
+      - srcData
+      - darData
+    properties:
+      srcData:
+        $ref: '#/definitions/SrcData'
+      darData:
+        $ref: '#/definitions/DarData'
+
+  Plugin:
+    properties:
+      dar-name:
+        type: string
+      action-class-name:
+        type: string
+      xsl:
+        type: array
+        items:
+          $ref: '#/definitions/XsltSource'
+
+  XsltSource:
+    properties:
+      xsl-name:
+        type: string
+      xsl-url:
+        type: string
+
+  DarIri:
+    required:
+      - dar-name
+      - iri
+    properties:
+      dar-name:
+        type: string
+      iri:
+        type: string
+
+  Error:
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string

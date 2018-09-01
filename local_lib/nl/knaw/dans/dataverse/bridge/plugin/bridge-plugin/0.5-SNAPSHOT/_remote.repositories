@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Tue Aug 28 15:55:13 CEST 2018
+bridge-plugin-0.5-SNAPSHOT.jar>=
+bridge-plugin-0.5-SNAPSHOT.pom>=
+bridge-plugin-0.5-SNAPSHOT-jar-with-dependencies.jar>=
