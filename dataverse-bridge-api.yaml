@@ -48,28 +48,28 @@ paths:
           description: Dataset couldn't have been created.
         '405':
           description: "Invalid input"
-    put:
-      tags:
-      - Archiving
-      summary: Re-ingest dataset
-      description: Re-ingest the existing dataset. This only can be done for an archive that has IN-PROGRESS state.
-      operationId: reIngestToDar
-      produces:
-      - application/json
-      parameters:
-        - in: body
-          name: archivingAuditlog
-          description: Updated archive object
-          required: true
-          schema:
-            $ref: '#/definitions/Archiving'
-      responses:
-        200:
-          description: "Dataset is archived"
-        400:
-          description: Invalid id supplied
-        404:
-          description: Archived not found
+    # put:
+    #   tags:
+    #   - Archiving
+    #   summary: Re-ingest dataset
+    #   description: Re-ingest the existing dataset. This only can be done for an archive that has IN-PROGRESS state.
+    #   operationId: reIngestToDar
+    #   produces:
+    #   - application/json
+    #   parameters:
+    #     - in: body
+    #       name: archivingAuditlog
+    #       description: Updated archive object
+    #       required: true
+    #       schema:
+    #         $ref: '#/definitions/Archiving'
+    #   responses:
+    #     200:
+    #       description: "Dataset is archived"
+    #     400:
+    #       description: Invalid id supplied
+    #     404:
+    #       description: Archived not found
 
   /archiving/state:
     get:
@@ -112,6 +112,30 @@ paths:
       operationId: "getAll"
       produces:
       - application/json
+      responses:
+        '200':
+          description: Plugin response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Archiving'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /auditlog/filtered-by-state/{state}:
+    get:
+      tags:
+      - "Archiving Auditlog"
+      operationId: "getByState"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "state"
+          in: "path"
+          description: "Record id"
+          required: true
+          type: "string"
       responses:
         '200':
           description: Plugin response
@@ -207,8 +231,7 @@ paths:
           in: "path"
           description: "Record id to delete"
           required: true
-          type: "integer"
-          format: "int64"
+          type: "string"
       responses:
         200:
           description: "Record is deleted"
@@ -222,7 +245,7 @@ paths:
       tags:
       - "DAR IRI"
       summary: "Operation to create a new DAR IRI"
-      description: "Add a new DAR IRI"
+      description: "Add a new DAR IRI. The existing DAR IRI with the same name will be overwritten."
       operationId: "addDarIri"
       consumes:
       - "application/json"
@@ -289,7 +312,7 @@ paths:
       tags:
       - "Plugins"
       summary: "Uploads plugin"
-      description: "Add a new plugin"
+      description: "Add a new plugin. The existing plugin with the same name will be overwritten."
       operationId: "uploadPlugin"
       consumes:
       - multipart/form-data

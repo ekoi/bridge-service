@@ -50,6 +50,23 @@ public class ArchivingAuditlogDao {
     }
 
     /**
+     * Delete all archivingAuditLog from the database.
+     */
+    public int deleteAll() {
+        Query q = entityManager.createQuery("DELETE from ArchivingAuditLog");
+        return q.executeUpdate();
+    }
+
+    /**
+     * Delete archivingAuditLog filtered by state from the database.
+     */
+    public int deleteFilteredByState(String state) {
+        Query q = entityManager.createQuery("DELETE from ArchivingAuditLog where state = :state ")
+                .setParameter("state", state);
+        return q.executeUpdate();
+    }
+
+    /**
      * Return all the archiveds stored in the database.
      */
     @SuppressWarnings("unchecked")
@@ -57,6 +74,11 @@ public class ArchivingAuditlogDao {
         return entityManager.createQuery("from ArchivingAuditLog order by id").getResultList();
     }
 
+    public List<ArchivingAuditLog> getByState(String state) {
+        return entityManager.createQuery("from ArchivingAuditLog where state = :state order by id")
+                .setParameter("state", state)
+                .getResultList();
+    }
 
     /**
      * Update the passed archivingAuditLog in the database.

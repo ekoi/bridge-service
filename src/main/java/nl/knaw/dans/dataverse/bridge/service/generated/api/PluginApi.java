@@ -30,7 +30,7 @@ import javax.validation.constraints.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-01T17:21:41.259+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-02T19:29:22.525+02:00")
 
 @Api(value = "plugin", description = "the plugin API")
 public interface PluginApi {
@@ -73,7 +73,7 @@ public interface PluginApi {
     }
 
 
-    @ApiOperation(value = "Uploads plugin", nickname = "uploadPlugin", notes = "Add a new plugin", tags={ "Plugins", })
+    @ApiOperation(value = "Uploads plugin", nickname = "uploadPlugin", notes = "Add a new plugin. The existing plugin with the same name will be overwritten.", tags={ "Plugins", })
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "New Plugin succesfully created."),
         @ApiResponse(code = 400, message = "New Plugin couldn't have been created."),

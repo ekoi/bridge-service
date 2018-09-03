@@ -45,8 +45,6 @@ public class AuditlogApiController implements AuditlogApi {
     @Autowired
     ArchivingAuditlogDao archivingAuditlogDao;
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuditlogApiController.class);
-
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
@@ -78,13 +76,20 @@ public class AuditlogApiController implements AuditlogApi {
             method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteAll(@ApiParam(value = "" ,required=true) @RequestHeader(value="api_key", required=true) String apiKey) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
+            if(!apiKey.equals( env.getProperty("bridge.apikey")))
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+            int deletedResult = archivingAuditlogDao.deleteAll();
+            log.info("Deleted result: {}", deletedResult);
+            simpleEmail.sendToAdmin("DELETE ALL", "All ArchivingAuditlog records are deleted, deletedResult: " + deletedResult);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in public AuditlogApi interface so no example is generated");
         }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-
+    @Override
     @ApiOperation(value = "Deletes a record", nickname = "deleteById", notes = "", tags={ "Archiving Auditlog", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Record is deleted"),
@@ -99,17 +104,18 @@ public class AuditlogApiController implements AuditlogApi {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
             ArchivingAuditLog dbArchivingAuditLog = archivingAuditlogDao.getById(id);
-            if (dbArchivingAuditLog != null) {
-                archivingAuditlogDao.delete(dbArchivingAuditLog);
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
+            if (dbArchivingAuditLog == null)
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+            archivingAuditlogDao.delete(dbArchivingAuditLog);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default ArchiveApi interface so no example is generated");
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-
+    @Override
     @ApiOperation(value = "Delete records filtered by its state", nickname = "deleteFilteredByState", notes = "Delete records filtered by its state", tags={ "Archiving Auditlog", })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Record is deleted"),
@@ -118,12 +124,18 @@ public class AuditlogApiController implements AuditlogApi {
     @RequestMapping(value = "/auditlog/delete/{state}",
             produces = { "application/json" },
             method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteFilteredByState(@ApiParam(value = "" ,required=true) @RequestHeader(value="api_key", required=true) String apiKey,@ApiParam(value = "Record id to delete",required=true) @PathVariable("state") Long state) {
+    public ResponseEntity<Void> deleteFilteredByState(@ApiParam(value = "" ,required=true) @RequestHeader(value="api_key", required=true) String apiKey,@ApiParam(value = "Record id to delete",required=true) @PathVariable("state") String state) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
+            if(!apiKey.equals( env.getProperty("bridge.apikey")))
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+            int deletedResult = archivingAuditlogDao.deleteFilteredByState(state);
+            log.info("Deleted result: {}", deletedResult);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in public AuditlogApi interface so no example is generated");
         }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 
@@ -148,7 +160,7 @@ public class AuditlogApiController implements AuditlogApi {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default ArchiveApi interface so no example is generated");
         }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 
@@ -164,7 +176,11 @@ public class AuditlogApiController implements AuditlogApi {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
-                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"srcXml\" : \"srcXml\",  \"landingPage\" : \"landingPage\",  \"pid\" : \"pid\",  \"startTime\" : \"2000-01-23\",  \"id\" : 0,  \"endTime\" : \"2000-01-23\",  \"state\" : \"IN-PROGRESS\",  \"srcVersion\" : \"srcVersion\",  \"targetIri\" : \"targetIri\"}", nl.knaw.dans.dataverse.bridge.service.db.domain.ArchivingAuditLog.class), HttpStatus.NOT_IMPLEMENTED);
+                    ArchivingAuditLog dbArchivingAuditLog = archivingAuditlogDao.getById(id);
+                    if (dbArchivingAuditLog == null)
+                        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+                    return new ResponseEntity<>(getObjectMapper().get().readValue(objectMapper.writeValueAsString(dbArchivingAuditLog), ArchivingAuditLog.class), HttpStatus.OK);
                 } catch (IOException e) {
                     log.error("Couldn't serialize response for content type application/json", e);
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -173,6 +189,32 @@ public class AuditlogApiController implements AuditlogApi {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in public AuditlogApi interface so no example is generated");
         }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
+    @Override
+    @ApiOperation(value = "", nickname = "getByState", notes = "", response = nl.knaw.dans.dataverse.bridge.service.db.domain.ArchivingAuditLog.class, responseContainer = "List", tags={ "Archiving Auditlog", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Plugin response", response = nl.knaw.dans.dataverse.bridge.service.db.domain.ArchivingAuditLog.class, responseContainer = "List"),
+            @ApiResponse(code = 200, message = "unexpected error", response = Error.class) })
+    @RequestMapping(value = "/auditlog/filtered-by-state/{state}",
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    public ResponseEntity<List<nl.knaw.dans.dataverse.bridge.service.db.domain.ArchivingAuditLog>> getByState(@ApiParam(value = "Record id",required=true) @PathVariable("state") String state) {
+        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
+            if (getAcceptHeader().get().contains("application/json")) {
+                try {
+                    List<ArchivingAuditLog> archivingAuditLogs = archivingAuditlogDao.getByState(state);
+                    return new ResponseEntity<>(getObjectMapper().get().readValue(objectMapper.writeValueAsString(archivingAuditLogs), List.class), HttpStatus.NOT_IMPLEMENTED);
+                } catch (IOException e) {
+                    log.error("Couldn't serialize response for content type application/json", e);
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+        } else {
+            log.warn("ObjectMapper or HttpServletRequest not configured in default AuditlogApi interface so no example is generated");
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
 }

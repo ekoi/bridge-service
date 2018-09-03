@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
  * XsltSource
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-01T17:21:41.259+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-02T19:29:22.525+02:00")
 
 public class XsltSource   {
   @JsonProperty("xsl-name")

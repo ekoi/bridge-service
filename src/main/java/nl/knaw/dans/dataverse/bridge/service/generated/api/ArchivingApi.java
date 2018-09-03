@@ -29,7 +29,7 @@ import javax.validation.constraints.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-01T17:21:41.259+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-02T19:29:22.525+02:00")
 
 @Api(value = "archiving", description = "the archiving API")
 public interface ArchivingApi {
@@ -91,23 +91,6 @@ public interface ArchivingApi {
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }
-        } else {
-            log.warn("ObjectMapper or HttpServletRequest not configured in default ArchivingApi interface so no example is generated");
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-
-    @ApiOperation(value = "Re-ingest dataset", nickname = "reIngestToDar", notes = "Re-ingest the existing dataset. This only can be done for an archive that has IN-PROGRESS state.", tags={ "Archiving", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Dataset is archived"),
-        @ApiResponse(code = 400, message = "Invalid id supplied"),
-        @ApiResponse(code = 404, message = "Archived not found") })
-    @RequestMapping(value = "/archiving",
-        produces = { "application/json" }, 
-        method = RequestMethod.PUT)
-    default ResponseEntity<Void> reIngestToDar(@ApiParam(value = "Updated archive object" ,required=true )  @Valid @RequestBody nl.knaw.dans.dataverse.bridge.service.db.domain.ArchivingAuditLog archivingAuditlog) {
-        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default ArchivingApi interface so no example is generated");
         }

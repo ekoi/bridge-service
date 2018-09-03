@@ -67,8 +67,6 @@ public class ArchivingApiController implements ArchivingApi {
     @Autowired
     private ArchivingAuditlogDao archivingAuditlogDao;
 
-    private static final Logger LOG = LoggerFactory.getLogger(ArchivingApiController.class);
-
     private List<DarPluginConf> darPluginConfList = new ArrayList<DarPluginConf>();
 
     private static Map<String, String> darTarget = new HashMap<String, String>();
@@ -109,7 +107,7 @@ public class ArchivingApiController implements ArchivingApi {
                 try {
                     ArchivingAuditLog dbArchivingAuditLog = archivingAuditlogDao.getBySrcxmlSrcversionTargetiri(srcMetadataXml, srcMetadataVersion, targetDarName);
                     if (dbArchivingAuditLog == null) {
-                        LOG.error("The following request is NOT FOUND: srcMetadataXml: " + srcMetadataXml + "\tsrcMetadataVersion: " + srcMetadataVersion + "\ttargetDarName: " + targetDarName);
+                        log.error("The following request is NOT FOUND: srcMetadataXml: " + srcMetadataXml + "\tsrcMetadataVersion: " + srcMetadataVersion + "\ttargetDarName: " + targetDarName);
                         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                     }
 
@@ -136,6 +134,7 @@ public class ArchivingApiController implements ArchivingApi {
             consumes = { "application/json" },
             method = RequestMethod.POST)
     public ResponseEntity<nl.knaw.dans.dataverse.bridge.service.db.domain.ArchivingAuditLog> ingestToDar(@ApiParam(value = "Dataset object that needs to be added to the Archived's table." ,required=true )  @Valid @RequestBody IngestData ingestData) {
+        String errorMessage = "";
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
@@ -148,7 +147,7 @@ public class ArchivingApiController implements ArchivingApi {
                         int statusCode = checkCredentials(darIri
                                 , ingestData.getDarData().getUsername()
                                 , ingestData.getDarData().getPassword()
-                                , env.getProperty("bridge.dar.timeout", Integer.class));
+                                , env.getProperty("bridge.dar.credentials.checking.timeout", Integer.class));
                         switch (statusCode) {
                             case org.apache.http.HttpStatus.SC_REQUEST_TIMEOUT:
                                 return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
@@ -168,55 +167,29 @@ public class ArchivingApiController implements ArchivingApi {
                         }
                     }
                 } catch (URISyntaxException e) {
-                    log.error("URISyntaxException: " + e.getMessage());
+                    errorMessage = "URISyntaxException: " + e.getMessage();
                 } catch (JsonParseException e) {
-                    log.error("Couldn't serialize response for content type application/json", e);;
+                    errorMessage = "Couldn't serialize response for content type application/json, msg: " + e.getMessage();
                 } catch (JsonMappingException e) {
-                    log.error("JsonMappingException: " + e.getMessage());
+                    errorMessage = "JsonMappingException: " + e.getMessage();
                 } catch (JsonProcessingException e) {
-                    log.error("JsonProcessingException: " + e.getMessage());
+                    errorMessage = "JsonProcessingException: " + e.getMessage();
                 } catch (IOException e) {
-                    log.error("IOException: " + e.getMessage());
-                }
-                catch (IllegalAccessException e) {
-                    log.error("IllegalAccessException: " + e.getMessage());
+                    errorMessage = "IOException: " + e.getMessage();
+                } catch (IllegalAccessException e) {
+                    errorMessage = "IllegalAccessException: " + e.getMessage();
                 } catch (InstantiationException e) {
-                    log.error("InstantiationException: " + e.getMessage());
+                    errorMessage = "InstantiationException: " + e.getMessage();
                 } catch (ClassNotFoundException e) {
-                    log.error("ClassNotFoundException: " + e.getMessage());
-                    //send mail
+                    errorMessage = "ClassNotFoundException: " + e.getMessage();
                 }
-
+                log.error(errorMessage);
+                simpleEmail.sendToAdmin("EXCEPTION ERROR", errorMessage);
             }
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default ArchiveApi interface so no example is generated");
         }
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Override
-    @ApiOperation(value = "Re-ingest dataset", nickname = "reIngestToDar", notes = "Re-ingest the existing dataset. This only can be done for an archive that has IN-PROGRESS state.", tags={ "Archiving", })
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Dataset is archived"),
-            @ApiResponse(code = 400, message = "Invalid id supplied"),
-            @ApiResponse(code = 404, message = "Archived not found") })
-    @RequestMapping(value = "/archiving",
-            produces = { "application/json" },
-            method = RequestMethod.PUT)
-    public ResponseEntity<Void> reIngestToDar(@ApiParam(value = "Updated archive object" ,required=true )  @Valid @RequestBody nl.knaw.dans.dataverse.bridge.service.db.domain.ArchivingAuditLog archivingAuditlog) {
-        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
-        } else {
-            ArchivingAuditLog dbArchivingAuditlog = archivingAuditlogDao.getBySrcxmlSrcversionTargetiriState(archivingAuditlog.getSrcMetadataXml()
-                                                                                            , archivingAuditlog.getSrcMetadataVersion()
-                                                                                            , archivingAuditlog.getTargetIri(),
-                                                                                            "IN-PROGRESS");
-            if (dbArchivingAuditlog == null)
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-
-            log.warn("ObjectMapper or HttpServletRequest not configured in default ArchivingApi interface so no example is generated");
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     private int checkCredentials(String darIri, String uid, String pwd, int timeout) throws URISyntaxException {
@@ -244,34 +217,34 @@ public class ArchivingApiController implements ArchivingApi {
     }
 
     private ArchivingAuditLog ingestToDar(IngestData ingestData, String darIri, DarPluginConf darPluginConf) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        LOG.info(">>>>>>> Trying ingest to " + ingestData.getDarData().getDarName() + " from url source: " + ingestData.getSrcData().getSrcXml());
+        log.info(">>>>>>> Trying ingest to " + ingestData.getDarData().getDarName() + " from url source: " + ingestData.getSrcData().getSrcXml());
         URLClassLoader actionClassLoader = darPluginConf.getActionClassLoader();
         Class actionClass = Class.forName(darPluginConf.getActionClassName(), true, actionClassLoader);
         IAction action = (IAction)actionClass.newInstance();
-        LOG.info(action.toString());
+        log.info(action.toString());
         ArchivingAuditLog archivingAuditLog = createNewArchived(ingestData, darIri);
         Flowable.fromCallable(() -> {
-            LOG.info("Starting process of ingest using Flowable.fromCallable()");
+            log.info("Starting process of ingest using Flowable.fromCallable()");
             Instant start = Instant.now();
             String bagDir = env.getProperty("bridge.temp.dir.bags");
             Map<String, String> transformResult = action.transform(ingestData.getSrcData().getSrcXml(), ingestData.getSrcData().getApiToken(), darPluginConf.getXsl());
             Optional<File> bagitFile = action.composeBagit(bagDir, ingestData.getSrcData().getApiToken(), ingestData.getSrcData().getSrcXml(), transformResult);
             if(bagitFile.isPresent()){
-                LOG.info("Set the bagit dir in database. Bagit dir: " + bagDir);
+                log.info("Set the bagit dir in database. Bagit dir: " + bagDir);
                 archivingAuditLog.setBagitDir(bagitFile.get().getAbsolutePath().replace(".zip", ""));
                 archivingAuditlogDao.update(archivingAuditLog);
             }
             IResponseData responseDataHolder = action.execute(bagitFile, new IRI(darIri), ingestData.getDarData().getUsername(), Optional.of(ingestData.getDarData().getPassword()));
             if (responseDataHolder != null) {
-                LOG.info("Intermediate saving the response data information.");
+                log.info("Intermediate saving the response data information.");
                 archivingAuditLog.setState(responseDataHolder.getState());
                 archivingAuditLog.setLog(responseDataHolder.getFeedXml().get());
                 archivingAuditlogDao.update(archivingAuditLog);
             }
             Instant finish = Instant.now();
             long timeElapsed = Duration.between(start, finish).getSeconds();
-            LOG.info("The process is done in " + timeElapsed + " seconds.");
-            LOG.info("#### End of ingest process using Flowable.fromCallable() ####");
+            log.info("The process is done in " + timeElapsed + " seconds.");
+            log.info("#### End of ingest process using Flowable.fromCallable() ####");
             return responseDataHolder;
         })
                 .subscribeOn(Schedulers.io())
@@ -285,7 +258,7 @@ public class ArchivingApiController implements ArchivingApi {
                     } else {
                         msg = ex.getMessage();
                     }
-                    LOG.error("[doOnError], msg: " + msg);
+                    log.error("[doOnError], msg: " + msg);
                     String prevMsg = archivingAuditLog.getLog();
                     if (prevMsg != null)
                         msg = prevMsg + "|" + msg;
@@ -299,9 +272,9 @@ public class ArchivingApiController implements ArchivingApi {
                     if (erd != null)
                         saveAndClean(archivingAuditLog, erd);
                     else
-                        LOG.error("The response data is null.");
+                        log.error("The response data is null.");
                 }, throwable -> {
-                    LOG.error("[throwable], msg: " + throwable.getCause().getMessage());
+                    log.error("[throwable], msg: " + throwable.getCause().getMessage());
                     simpleEmail.sendToAdmin("[throwable]", throwable.getCause().getMessage());
                 });
         return archivingAuditLog;
@@ -315,19 +288,19 @@ public class ArchivingApiController implements ArchivingApi {
         archivingAuditLog.setState(erd.getState());
         if (erd.getFeedXml() != null)
             archivingAuditLog.setLog(erd.getFeedXml().get());
-        LOG.info("Ingest finish. Status " + erd.getState());
+        log.info("Ingest finish. Status " + erd.getState());
         if (erd.getState().equals(StateEnum.ARCHIVED.toString())) {
             //delete bagitdir and its zip.
-            LOG.info(archivingAuditLog.getBagitDir());
+            log.info(archivingAuditLog.getBagitDir());
             File bagDirToDelete = FileUtils.getFile(archivingAuditLog.getBagitDir());
             File bagZipFileToDelete = FileUtils.getFile(archivingAuditLog.getBagitDir() + ".zip");
             boolean bagZipFileIsDeleted = FileUtils.deleteQuietly(bagZipFileToDelete);
             if (bagZipFileIsDeleted) {
-                LOG.info("Bagit files are deleted.");
+                log.info("Bagit files are deleted.");
                 archivingAuditLog.setBagitDir("DELETED");
             } else {
-                LOG.warn(bagDirToDelete.getAbsolutePath() + " is not deleted");
-                LOG.warn(bagZipFileToDelete + " is not deleted");
+                log.warn(bagDirToDelete.getAbsolutePath() + " is not deleted");
+                log.warn(bagZipFileToDelete + " is not deleted");
             }
         } else {
             simpleEmail.sendToAdmin(erd.getState(), objectMapper.writeValueAsString(archivingAuditLog));
