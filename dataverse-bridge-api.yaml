@@ -252,6 +252,10 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - name: "api_key"
+        in: "header"
+        required: true
+        type: "string"
       - in: "body"
         name: "darNameAndIri"
         description: "DAR IRI that needs to be added."
@@ -319,6 +323,10 @@ paths:
       produces:
       - "application/json"
       parameters:
+        - name: "api_key"
+          in: "header"
+          required: true
+          type: "string"
         - in: formData
           name: zipPlugin
           type: file

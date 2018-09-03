@@ -16,7 +16,7 @@ import javax.validation.constraints.*;
  * Plugin
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-02T19:29:22.525+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-03T13:13:10.962+02:00")
 
 public class Plugin   {
   @JsonProperty("dar-name")

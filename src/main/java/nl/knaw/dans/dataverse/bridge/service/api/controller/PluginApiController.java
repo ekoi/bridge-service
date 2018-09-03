@@ -15,6 +15,7 @@ import nl.knaw.dans.dataverse.bridge.service.util.PluginRegisterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,9 @@ import java.util.zip.ZipInputStream;
 
 @Controller
 public class PluginApiController implements PluginApi {
+    @Autowired
+    private Environment env;
+
     @Autowired
     private BridgeConfEnvironment bcenv;
     
@@ -68,9 +72,12 @@ public class PluginApiController implements PluginApi {
             produces = { "application/json" },
             consumes = { "multipart/form-data" },
             method = RequestMethod.POST)
-    public ResponseEntity<Void> uploadPlugin(@ApiParam(value = "file detail") @Valid @RequestParam("file") MultipartFile zipPlugin, @ApiParam(value = "",required=true) @PathVariable("dar-name") String darName) {
+    public ResponseEntity<Void> uploadPlugin(@ApiParam(value = "" ,required=true) @RequestHeader(value="api_key", required=true) String apiKey,@ApiParam(value = "file detail") @Valid @RequestPart("file") MultipartFile zipPlugin,@ApiParam(value = "",required=true) @PathVariable("dar-name") String darName) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
+                if(!apiKey.equals( env.getProperty("bridge.apikey")))
+                    return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
                 try {
                     DarPluginConf tdrPluginConf = pluginRegisterService.storePlugin(zipPlugin.getInputStream(), zipPlugin.getOriginalFilename(), darName);
                     //register plugin

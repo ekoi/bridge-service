@@ -30,7 +30,7 @@ import javax.validation.constraints.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-02T19:29:22.525+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-03T13:13:10.962+02:00")
 
 @Api(value = "plugin", description = "the plugin API")
 public interface PluginApi {
@@ -82,7 +82,7 @@ public interface PluginApi {
         produces = { "application/json" }, 
         consumes = { "multipart/form-data" },
         method = RequestMethod.POST)
-    default ResponseEntity<Void> uploadPlugin(@ApiParam(value = "file detail") @Valid @RequestPart("file") MultipartFile zipPlugin,@ApiParam(value = "",required=true) @PathVariable("dar-name") String darName) {
+    default ResponseEntity<Void> uploadPlugin(@ApiParam(value = "" ,required=true) @RequestHeader(value="api_key", required=true) String apiKey,@ApiParam(value = "file detail") @Valid @RequestPart("file") MultipartFile zipPlugin,@ApiParam(value = "",required=true) @PathVariable("dar-name") String darName) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default PluginApi interface so no example is generated");

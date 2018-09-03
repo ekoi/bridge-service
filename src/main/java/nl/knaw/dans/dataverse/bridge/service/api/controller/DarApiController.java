@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -34,6 +35,9 @@ import java.util.Optional;
 
 @Controller
 public class DarApiController implements DarApi {
+    @Autowired
+    private Environment env;
+
     @Value("${spring.profiles.active}")
     private String activeProfile;
 
@@ -61,17 +65,20 @@ public class DarApiController implements DarApi {
     }
 
     @Override
-    @ApiOperation(value = "Operation to create a new DAR IRI", nickname = "addDarIri", notes = "Add a new DAR IRI. The existing DAR IRI with the same name will be overwritten.", tags = {"DAR IRI",})
+    @ApiOperation(value = "Operation to create a new DAR IRI", nickname = "addDarIri", notes = "Add a new DAR IRI. The existing DAR IRI with the same name will be overwritten.", tags={ "DAR IRI", })
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "DarIri succesfully created."),
             @ApiResponse(code = 400, message = "DarIri couldn't have been created."),
-            @ApiResponse(code = 405, message = "Invalid input")})
+            @ApiResponse(code = 405, message = "Invalid input") })
     @RequestMapping(value = "/dar",
-            produces = {"application/json"},
-            consumes = {"application/json"},
+            produces = { "application/json" },
+            consumes = { "application/json" },
             method = RequestMethod.POST)
-    public ResponseEntity<Void> addDarIri(@ApiParam(value = "DAR IRI that needs to be added.", required = true) @Valid @RequestBody DarIri darNameAndIri) {
+    public ResponseEntity<Void> addDarIri(@ApiParam(value = "" ,required=true) @RequestHeader(value="api_key", required=true) String apiKey, @ApiParam(value = "DAR IRI that needs to be added." ,required=true )  @Valid @RequestBody DarIri darNameAndIri) {
         if (getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
+            if(!apiKey.equals( env.getProperty("bridge.apikey")))
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
             try {
                 bcenv.getDarTarget().put(darNameAndIri.getDarName(), darNameAndIri.getIri());
                 String jsonDarIri = objectMapper.writeValueAsString(darNameAndIri);

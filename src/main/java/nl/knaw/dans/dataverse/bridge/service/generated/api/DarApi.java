@@ -29,7 +29,7 @@ import javax.validation.constraints.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-02T19:29:22.525+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-03T13:13:10.962+02:00")
 
 @Api(value = "dar", description = "the dar API")
 public interface DarApi {
@@ -48,7 +48,7 @@ public interface DarApi {
         return getRequest().map(r -> r.getHeader("Accept"));
     }
 
-    @ApiOperation(value = "Operation to create a new DAR IRI", nickname = "addDarIri", notes = "Add a new DAR IRI. the existing DAR IRI with the same name will be overwritten.", tags={ "DAR IRI", })
+    @ApiOperation(value = "Operation to create a new DAR IRI", nickname = "addDarIri", notes = "Add a new DAR IRI. The existing DAR IRI with the same name will be overwritten.", tags={ "DAR IRI", })
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "DarIri succesfully created."),
         @ApiResponse(code = 400, message = "DarIri couldn't have been created."),
@@ -57,7 +57,7 @@ public interface DarApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    default ResponseEntity<Void> addDarIri(@ApiParam(value = "DAR IRI that needs to be added." ,required=true )  @Valid @RequestBody DarIri darNameAndIri) {
+    default ResponseEntity<Void> addDarIri(@ApiParam(value = "" ,required=true) @RequestHeader(value="api_key", required=true) String apiKey,@ApiParam(value = "DAR IRI that needs to be added." ,required=true )  @Valid @RequestBody DarIri darNameAndIri) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default DarApi interface so no example is generated");
