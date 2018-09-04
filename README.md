@@ -43,9 +43,18 @@ Create a json (eg: dvn.json) file that contains the bridge url, the user group w
 
 curl -X PUT -d '/path-to/dvn.json' http://localhost:8080/api/admin/settings/:DataverseBridgeConf
 
-__Role Setting__
+__Dataverse Role Setting__
 
-Todo:
+To be able to archive a dataset with Sword, the following conditions have been set:
+
+* The user should be part of a group named 'SWORD'.
+* The user should have an admin-role for the dataverse that contains the dataset that is going to be archived.
+
+_Configuration_
+
+Create a group 'SWORD' (alias 'SWORD') in the dataverse root.
+Add the local admins to this group.
+No need to give this group permissions (a role) on any dataverse or dataset level. It is also not necessary to create a new role for this group.
 
 ## bridge-service
 
