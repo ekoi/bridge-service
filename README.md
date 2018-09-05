@@ -41,8 +41,11 @@ It uses [OpenAPI-Spec](https://github.com/swagger-api/swagger-core) to generate 
 
 The underlying library integrating swagger to SpringBoot is [springfox](https://github.com/springfox/springfox)
 
+![Bridge API](bridge-api.png "Bridge API")
+
+
 ## <a name="dataverse-code"></a>Changes needed in the Dataverse code
-To enable "Archive" button on the dataverse side, some _xhtml_, _java_ files and settings configurations are needed.
+To enable "Archive" button on the dataverse side, additional _xhtml_, _java_ files and settings configurations are needed.
 
 ![Archive button](archive-button.png "Archive Button")
 
@@ -68,8 +71,10 @@ Create a json (eg: dvn.json) file that contains the bridge url, the user group w
  }
 ```
 
-curl -X PUT -d '/path-to/dvn.json' http://localhost:8080/api/admin/settings/:DataverseBridgeConf
 
+```
+curl -X PUT -d '/path-to/dvn.json' http://localhost:8080/api/admin/settings/:DataverseBridgeConf
+```
 __Dataverse Role Setting__
 
 To be able to archive a dataset with Sword, the following conditions have been set:
@@ -85,7 +90,7 @@ No need to give this group permissions (a role) on any dataverse or dataset leve
 
 ## <a name="bridge-service-setting"></a>Setting up the bridge service
 
-###### How to generate:
+#### How to generate:
 
 ```
 swagger-codegen generate -i dataverse-bridge-api.yaml -l spring -o . -c dataverse-bridge-config.json\
@@ -101,7 +106,7 @@ src/main/java/nl/knaw/dans/dataverse/bridge/service/*
 src/main/resources/application.properties
 ```
 
-## Start the Bridge Appication
+#### Start the Bridge Appication
 
 Starting the server as an simple java application
 
@@ -117,7 +122,7 @@ java -Dspring.profiles.active=dev -Xdebug -Xrunjdwp:transport=dt_socket,server=y
 You can view the api documentation in swagger-ui by pointing to
 http://localhost:8592/api
 
-![Bridge API](bridge-api.png "Bridge API")
+
 
 
 
