@@ -27,7 +27,7 @@ More details how to create a new plugin can be found [here](#creating-plugin)
 The application consists of the following parts:
 *  [bridge-plugin](#bridge-plugin)
 *  [bridge-service](#bridge-service)
-*  [bridge-plugin-easy]
+*  [bridge-plugin-easy](#bridge-plugin-easy)
 
 ### <a name="bridge-plugin"></a>bridge-plugin
 The _bridge-plugin-_ mainly consist of interfaces that are used by the bridge-service to identify and treat all plugins the same way. The plugins need to implement the interfaces.
@@ -45,6 +45,9 @@ The underlying library integrating swagger to SpringBoot is [springfox](https://
 To enable "Archive" button on the dataverse side, some _xhtml_, _java_ files and settings configurations are needed.
 
 ![Archive button](archive-button.png "Archive Button")
+
+![Archive popup](archive-popup.png "Archive Popup")
+
 
 __Database Settings__
 
