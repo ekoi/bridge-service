@@ -26,6 +26,7 @@ hs_err_pid*
 target
 notes.txt
 *.properties
+!application-dev.properties
 *.tmp
 *.script
 #*.json

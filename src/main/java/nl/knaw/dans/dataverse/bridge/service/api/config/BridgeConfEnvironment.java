@@ -36,7 +36,7 @@ public class BridgeConfEnvironment implements EnvironmentAware {
     private static Environment env;
     private static final List<DarPluginConf> pluginList = new ArrayList<>();
     private static final Map<String, String> darTarget = new HashMap<>();
-    @Value("${spring.profiles.active:not-provide}")
+    @Value("${spring.profiles.active:dev}")
     private String activeProfile;
 
     @Override
@@ -49,11 +49,22 @@ public class BridgeConfEnvironment implements EnvironmentAware {
 
         LOG.info("###############################################################");
         LOG.info("#        Starting Dataverse Bridge Using '{}' profile.       #", activeProfile);
+        checkingRequiredProperties();
         checkingRequiredDirs();
         registerPlugins();
         readTdrConfiguration();
         LOG.info("#                                                             #");
         LOG.info("###############################################################");
+    }
+
+    private void checkingRequiredProperties() {
+        List<String> requiredProperties = Arrays.asList("bridge.apps.support.email.from", "spring.mail.host", "bridge.apikey", "bridge.temp.dir.bags");
+        requiredProperties.stream().forEach(x -> {
+            if(env.getProperty(x) == null || env.getProperty(x).isEmpty()){
+                LOG.error("'{}' not found in the application-{}.properties.", x, activeProfile);
+                System.exit(1);
+            }
+        });
     }
 
     public static Map<String, String> getDarTarget() {

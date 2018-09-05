@@ -1,6 +1,6 @@
 # Dataverse Bridge to Digital Archive Repository (DAR)
 
-![Dataverse Bridge](dataverse-bridge.png "Dataverse Bridge")
+![Dataverse Bridge](readme-imgs/dataverse-bridge.png "Dataverse Bridge")
 
 ## Overview
 
@@ -17,7 +17,7 @@ In the sections below more details are provided about:
 
 ## <a name="bridge-architecture"></a>Architecture
 
-![Plugins System](bridge-service.png "Plugins System")
+![Plugins System](readme-imgs/bridge-service.png "Plugins System")
 
 Due to modularity, flexibility and artifical separation purposes, the Dataverse Bridge application uses a simple plugin system architecture.
 Thanks to the [Java reflection API](https://docs.oracle.com/javase/tutorial/reflect/) that allows [runtime type introspections](https://en.wikipedia.org/wiki/Type_introspection),
@@ -41,15 +41,15 @@ It uses [OpenAPI-Spec](https://github.com/swagger-api/swagger-core) to generate 
 
 The underlying library integrating swagger to SpringBoot is [springfox](https://github.com/springfox/springfox)
 
-![Bridge API](bridge-api.png "Bridge API")
+![Bridge API](readme-imgs/bridge-api.png "Bridge API")
 
 
 ## <a name="dataverse-code"></a>Changes needed in the Dataverse code
 To enable "Archive" button on the dataverse side, additional _xhtml_, _java_ files and settings configurations are needed.
 
-![Archive button](archive-button.png "Archive Button")
+![Archive button](readme-imgs/archive-button.png "Archive Button")
 
-![Archive popup](archive-popup.png "Archive Popup")
+![Archive popup](readme-imgs/archive-popup.png "Archive Popup")
 
 
 __Database Settings__
@@ -90,7 +90,16 @@ No need to give this group permissions (a role) on any dataverse or dataset leve
 
 ## <a name="bridge-service-setting"></a>Setting up the bridge service
 
-#### How to generate:
+This [Quick start](#bridge-service-quickstart) shows how to deploy dataverse bridge and adden the is the easy way to build the dataverse bridge application.
+This quickstart shows how to deploy your first Java application to Service Fabric using the Eclipse IDE on a Linux developer machine. When you're finished, you have a voting application with a Java web front end that saves voting results in a stateful back-end service in the cluster.
+Other way, step by step from generating the service, modification the port etc can be followed [here](#bridge-service-fullstart).
+
+Prerequisites
+
+#### <a name="bridge-service-quickstart"></a>Quick start
+
+
+#### <a name="bridge-service-fullstart"></a>How to generate:
 
 ```
 swagger-codegen generate -i dataverse-bridge-api.yaml -l spring -o . -c dataverse-bridge-config.json\
