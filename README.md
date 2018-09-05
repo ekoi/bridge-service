@@ -147,6 +147,8 @@ easy.json (json file that describe the plugin, see an example below)
 -- xsl (directory where the xsl files are located)
 
 ```
+![Plugin Directory Structure](readme-imgs/plugin-dir-structure.png "Plugin Directory Structure")
+
 
 *easy.json*
 ```
