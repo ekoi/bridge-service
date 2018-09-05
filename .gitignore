@@ -13,6 +13,7 @@
 
 # Package Files #
 *.jar
+!bridge-plugin-0.5-SNAPSHOT-jar-with-dependencies.jar
 *.war
 *.ear
 *.zip
@@ -27,5 +28,5 @@ notes.txt
 *.properties
 *.tmp
 *.script
-*.json
+#*.json
 easy
