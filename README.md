@@ -96,7 +96,9 @@ Other way, step by step from generating the service, modification the port etc t
 
 
 #### <a name="bridge-service-quickstart"></a>Quick start
-Download [bridge-quickstart](bridge-quickstart.zip), unzip it in a folder. To start run on the terminal './start.sh'. To shutdown, execute './shutdown.sh' command.
+Download [bridge-quickstart](bridge-quickstart.zip), unzip it in a folder.\
+To start run on the terminal _start.sh_.\
+To shutdown, execute _shutdown.sh_ command.
 
 #### <a name="bridge-service-fullstart"></a>How to generate:
 The dataverse bridge includes the Spring boot that provides a set of starter Pom’s build file, which includes an embedded Servlet Container.\
@@ -122,7 +124,8 @@ src/main/resources/application.properties
 
 #### Start the Bridge Appication
 
-__Prerequisites__:\
+__Prerequisites__:
+
 * _Java 8_\
 The Dataverse Bridge appliation is build for java 8 and up.
 * _application properties_:\
@@ -208,8 +211,20 @@ curl -X POST 'http://localhost:8582/api/admin/shutdown
 ````
 
 
-## <a name="bridge-plugin-easy">The EASY bridge plug-in
-, which is the implementation of bridge-plugin for ingesting data to EASY repository
+## <a name="creating-plugin"></a>Creating a plugin
+
+Plugins must implements [IAction](https://github.com/ekoi/bridge-plugin/blob/master/src/main/java/nl/knaw/dans/dataverse/bridge/plugin/common/IAction.java) interface of the [bridge-plugin](https://github.com/ekoi/bridge-plugin). 
+
+Include this dependency into your pom.xml to obtain the 0.5-SNAPSHOT release version of the bridge-plugin
+````
+<dependency>
+    <groupId>nl.knaw.dans.dataverse.bridge.plugin</groupId>
+    <artifactId>bridge-plugin</artifactId>
+    <version>0.5-SNAPSHOT</version>    
+ </dependency>
+````
+The plugin rely on the power of XSLT that is its ability to change the structure of XML in one format to other. 
+In this case, it will transform the dataverse XML metadata (DDI, Dubli Core) or even Dataverse Metadata in JSON format to the desire Digital Archive Repository metadata.
 
 
 ###### <a name="bridge-plugin-structure"></a>Plugin Directory Structure
@@ -244,4 +259,6 @@ easy.json (json file that describe the plugin, see an example below)
 }
 ```
 
-## <a name="creating-plugin"></a>Creating a plugin
+## <a name="bridge-plugin-easy">The EASY bridge plug-in
+, which is the implementation of bridge-plugin for ingesting data to EASY repository
+
