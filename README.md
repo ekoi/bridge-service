@@ -92,15 +92,15 @@ No need to give this group permissions (a role) on any dataverse or dataset leve
 
 This [Quick start](#bridge-service-quickstart) shows how to deploy dataverse bridge by using the default properties.
 
-Other way, step by step from generating the service, modification the port etc that can be followed [here](#bridge-service-fullstart).
+Other way, step by step from generating the service, modification the port etc that can be followed from [here](#bridge-service-fullstart).
 
 
 #### <a name="bridge-service-quickstart"></a>Quick start
-Download ![bridge-quickstart.zip](bridge-quickstart.zip), unzip it in a folder. To start run on the terminal './start.sh'. To shutdown, execute './shutdown.sh' command.
+Download [bridge-quickstart](bridge-quickstart.zip), unzip it in a folder. To start run on the terminal './start.sh'. To shutdown, execute './shutdown.sh' command.
 
 #### <a name="bridge-service-fullstart"></a>How to generate:
 The dataverse bridge includes the Spring boot that provides a set of starter Pom’s build file, which includes an embedded Servlet Container.\
-The following command, shows how to go from an OpenAPI spec (![dataverse-bridge-api.yaml](dataverse-bridge-api.yaml)) to generated Spring Boot server stub.
+The following command, shows how to go from an OpenAPI spec ([dataverse-bridge-api](dataverse-bridge-api.yaml)) to generated Spring Boot server stub.
 
 ```
 swagger-codegen generate -i dataverse-bridge-api.yaml -l spring -o . -c dataverse-bridge-config.json\
@@ -122,17 +122,22 @@ src/main/resources/application.properties
 
 #### Start the Bridge Appication
 
-Prerequisites:\
-The application is build for java 8 and up.\
-There are some properties that need to fill in application-dev.properties file:\
+__Prerequisites__:\
+* _Java 8_\
+The Dataverse Bridge appliation is build for java 8 and up.
+* _application properties_:\
+The Dataverse Bridge appliation loads properties from the application properties that located in _config_ directory of the current working directory.
+The following properties are need to fill in application-dev.properties file:
 
 ```
 ################### Database Configuration ##########################
 spring.datasource.url=jdbc:hsqldb:file:./database/bridgedb;sql.syntax_pgs=true
 spring.datasource.username=sa
 spring.datasource.password=
+````
+'./database/bridgedb' means that the in-memory hsql database will be created in the database directory of the current working directory.
 
-
+````
 ################### JavaMail Configuration ##########################
 bridge.apps.support.email.from=
 bridge.apps.support.email.send.to=
@@ -142,7 +147,35 @@ spring.mail.host=
 ################# Apps Configuration ##############################
 bridge.apikey=
 bridge.temp.dir.bags=/path/bagit-temp/bags
+````
+For other environment, usually uses other profile-specific properties, eg: application-act.properties for acceptation server or application-prod.properties for production server. 
+You can launch your application with a -D argument, such as _-Dspring.profiles.active=prod_ to launch the Dataverse Bridge application using application-prod.properties.
+
+![Config](readme-imgs/config.png "Config")
+
+
+* _Log Directory_
+
+The location of the log directory is configured on the application properties. As default, the log directory is located on the 'logs' directory of the current working directory.
 ```
+################### Logging Configuration ##########################
+logging.path=./logs
+````
+
+* _Digital Archive Repository Target_
+
+The dar-target-conf is the directory where the configuration that contains the name and target URL of the Digital Archive Repository. The configuration has to provide as json file, eg: 
+*easy-dev.json*:
+```
+{
+    "dar-name":"EASY",
+    "iri":"http://deasy.dans.knaw.nl/sword2/collection/1"
+}
+```
+![Dar Target Conf](readme-imgs/dar-target-conf.png "DAR Target Conf")
+
+
+##### Starting the application
 
 Starting the server as an simple java application
 
@@ -170,15 +203,6 @@ The
 
 
 
-**dar-target-conf**
-
-*easy-dev.json*:
-```
-{
-    "dar-name":"EASY",
-    "iri":"http://deasy.dans.knaw.nl/sword2/collection/1"
-}
-```
 
 ###### <a name="bridge-plugin-structure"></a>Plugin Directory Structure
 You can add the plugin to the plugins directory or you can upload it as zip file.\
