@@ -122,20 +122,50 @@ src/main/resources/application.properties
 
 #### Start the Bridge Appication
 
-Starting the server as an simple java application
-
-Change default port value in application.properties
+Prerequisites:\
+The application is build for java 8 and up.\
+There are some properties that need to fill in application-dev.properties file:\
 
 ```
-java -Dspring.profiles.active=dev -jar target/dataverse-bridge-0.5.0.jar
+################### Database Configuration ##########################
+spring.datasource.url=jdbc:hsqldb:file:./database/bridgedb;sql.syntax_pgs=true
+spring.datasource.username=sa
+spring.datasource.password=
 
-java -Dspring.profiles.active=dev -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5105 -Xms128M -Xmx2G -jar dataverse-bridge-0.1.0.jar
+
+################### JavaMail Configuration ##########################
+bridge.apps.support.email.from=
+bridge.apps.support.email.send.to=
+spring.mail.host=
+
+
+################# Apps Configuration ##############################
+bridge.apikey=
+bridge.temp.dir.bags=/path/bagit-temp/bags
+```
+
+Starting the server as an simple java application
+
+```
+java -Dspring.profiles.active=dev -jar target/bridge-service-0.5.0.jar
+
+```
+To start in the debug mode:
+```
+
+java -Dspring.profiles.active=dev -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5105 -jar bridge-service-0.5.0.jar
 
 ```
 
 You can view the api documentation in swagger-ui by pointing to
-http://localhost:8592/api
+_http://localhost:8592/api_
 
+To shutdown the dataverse bridge application:
+````
+curl -X POST 'http://localhost:8582/api/admin/shutdown
+````
+
+The 
 
 
 
@@ -187,35 +217,7 @@ easy.json (json file that describe the plugin, see an example below)
 
 __application-dev.properties__
 
-```
-################## SPRINGFOX CONFIGURATION ##########################
 
-springfox.documentation.swagger.v2.path=/api-docs
-server.address=localhost
-server.contextPath=/api
-server.port=8592
-
-################### Database Configuration ##########################
-spring.datasource.url=jdbc:hsqldb:file:./database/bridgedb;sql.syntax_pgs=true
-spring.datasource.username=sa
-spring.datasource.password=
-
-
-################### JavaMail Configuration ##########################
-bridge.apps.support.email.from=
-bridge.apps.support.email.send.to=eko.indarto@dans.knaw.nl
-spring.mail.host=
-
-
-################# Apps Configuration ##############################
-bridge.dar.credentials.checking.timeout=3000
-bridge.apikey=this!sMyAP1K3Y10122004
-bridge.temp.dir.bags=/path/bagit-temp/bags
-bridge.base.path.database.dir=
-bridge.base.path.dar.target.conf.dir=
-bridge.base.path.plugins.dir=
-
-```
 ## <a name="bridge-plugin-easy">The EASY bridge plug-in
 , which is the implementation of bridge-plugin for ingesting data to EASY repository
 ## <a name="creating-plugin"></a>Creating a plugin
