@@ -213,6 +213,9 @@ curl -X POST 'http://localhost:8582/api/admin/shutdown
 
 ## <a name="creating-plugin"></a>Creating a plugin
 
+The plugin rely on the power of XSLT that is its ability to change the structure of XML in one format to other. 
+In this case, it will transform the dataverse XML metadata (DDI, Dubli Core) or even Dataverse Metadata in JSON format to the desire Digital Archive Repository metadata.
+
 Plugins must implements [IAction](https://github.com/ekoi/bridge-plugin/blob/master/src/main/java/nl/knaw/dans/dataverse/bridge/plugin/common/IAction.java) interface of the [bridge-plugin](https://github.com/ekoi/bridge-plugin). 
 
 Include this dependency into your pom.xml to obtain the 0.5-SNAPSHOT release version of the bridge-plugin
@@ -223,13 +226,9 @@ Include this dependency into your pom.xml to obtain the 0.5-SNAPSHOT release ver
     <version>0.5-SNAPSHOT</version>    
  </dependency>
 ````
-The plugin rely on the power of XSLT that is its ability to change the structure of XML in one format to other. 
-In this case, it will transform the dataverse XML metadata (DDI, Dubli Core) or even Dataverse Metadata in JSON format to the desire Digital Archive Repository metadata.
 
-
-###### <a name="bridge-plugin-structure"></a>Plugin Directory Structure
-You can add the plugin to the plugins directory or you can upload it as zip file.\
-The plugin must have the following structure:
+After creating the jar file from the project, the plugin can be uploaded (or deploy in the plugins directory of bridge-service) to the brige-service in the zip format.
+The plugin must have the following <a name="bridge-plugin-structure"></a>__Plugin Directory Structure__:
 
 ```
 easy (directory, must be in lowercase)
@@ -238,8 +237,10 @@ easy.json (json file that describe the plugin, see an example below)
 -- xsl (directory where the xsl files are located)
 
 ```
+![Plugin Directory Structure](readme-imgs/easy-plugin-structure.png "Plugin Directory Structure")
 
-*easy.json*
+
+An example of *easy.json*
 ```
 {
   "dar-name": "EASY",
