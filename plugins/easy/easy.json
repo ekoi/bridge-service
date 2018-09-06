@@ -1,0 +1,6 @@
+{
+  "dar-name": "EASY",
+  "action-class-name": "nl.knaw.dans.dataverse.bridge.plugin.dar.easy.EasyIngestAction",
+  "action-class-url": "lib/bridge-plugin-easy-0.5-SNAPSHOT-jar-with-dependencies.jar",
+  "xsl": [{"xsl-name":"dataset.xml", "xsl-url":"xsl/dvn-ddi2ddm-dataset.xsl"},{"xsl-name":"files.xml", "xsl-url":"xsl/dvn-ddi2ddm-files.xsl"}]
+}
