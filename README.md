@@ -90,14 +90,13 @@ No need to give this group permissions (a role) on any dataverse or dataset leve
 
 ## <a name="bridge-service-setting"></a>Setting up the bridge service
 
-This [Quick start](#bridge-service-quickstart) shows how to deploy dataverse bridge and adden the is the easy way to build the dataverse bridge application.
-This quickstart shows how to deploy your first Java application to Service Fabric using the Eclipse IDE on a Linux developer machine. When you're finished, you have a voting application with a Java web front end that saves voting results in a stateful back-end service in the cluster.
-Other way, step by step from generating the service, modification the port etc can be followed [here](#bridge-service-fullstart).
+This [Quick start](#bridge-service-quickstart) shows how to deploy dataverse bridge and using the default properties.
+Other way, step by step from generating the service, modification the port etc that can be followed [here](#bridge-service-fullstart).
 
 Prerequisites
 
 #### <a name="bridge-service-quickstart"></a>Quick start
-
+Download ![bridge-quickstart.zip](bridge-quickstart.zip), unzip it in a folder. To start run on the terminal './start.sh'. To shutdown, execute './shutdown.sh' command.
 
 #### <a name="bridge-service-fullstart"></a>How to generate:
 
