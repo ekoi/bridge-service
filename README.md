@@ -174,10 +174,17 @@ The dar-target-conf is the directory where the configuration that contains the n
 ```
 ![Dar Target Conf](readme-imgs/dar-target-conf.png "DAR Target Conf")
 
+* _Plugins Directory_
+
+In this directory, you can put your plugin. The plugin it self has certain structure that is describe [here](#bridge-plugin-structure).
+
+![Plugin Directory Structure](readme-imgs/plugin-dir-structure.png "Plugin Directory Structure")
+
 
 ##### Starting the application
 
-Starting the server as an simple java application
+Starting the server as an simple java application.\
+The 'application-dev.properties' is used as indicate on '-D' argument: -Dspring.profiles.active=dev
 
 ```
 java -Dspring.profiles.active=dev -jar target/bridge-service-0.5.0.jar
@@ -193,15 +200,16 @@ java -Dspring.profiles.active=dev -Xdebug -Xrunjdwp:transport=dt_socket,server=y
 You can view the api documentation in swagger-ui by pointing to
 _http://localhost:8592/api_
 
+##### Stopping the application
+
 To shutdown the dataverse bridge application:
 ````
 curl -X POST 'http://localhost:8582/api/admin/shutdown
 ````
 
-The 
 
-
-
+## <a name="bridge-plugin-easy">The EASY bridge plug-in
+, which is the implementation of bridge-plugin for ingesting data to EASY repository
 
 
 ###### <a name="bridge-plugin-structure"></a>Plugin Directory Structure
@@ -215,8 +223,6 @@ easy.json (json file that describe the plugin, see an example below)
 -- xsl (directory where the xsl files are located)
 
 ```
-![Plugin Directory Structure](readme-imgs/plugin-dir-structure.png "Plugin Directory Structure")
-
 
 *easy.json*
 ```
@@ -238,10 +244,4 @@ easy.json (json file that describe the plugin, see an example below)
 }
 ```
 
-
-__application-dev.properties__
-
-
-## <a name="bridge-plugin-easy">The EASY bridge plug-in
-, which is the implementation of bridge-plugin for ingesting data to EASY repository
 ## <a name="creating-plugin"></a>Creating a plugin
