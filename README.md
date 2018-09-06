@@ -90,28 +90,34 @@ No need to give this group permissions (a role) on any dataverse or dataset leve
 
 ## <a name="bridge-service-setting"></a>Setting up the bridge service
 
-This [Quick start](#bridge-service-quickstart) shows how to deploy dataverse bridge and using the default properties.
+This [Quick start](#bridge-service-quickstart) shows how to deploy dataverse bridge by using the default properties.
+
 Other way, step by step from generating the service, modification the port etc that can be followed [here](#bridge-service-fullstart).
 
-Prerequisites
 
 #### <a name="bridge-service-quickstart"></a>Quick start
 Download ![bridge-quickstart.zip](bridge-quickstart.zip), unzip it in a folder. To start run on the terminal './start.sh'. To shutdown, execute './shutdown.sh' command.
 
 #### <a name="bridge-service-fullstart"></a>How to generate:
+The dataverse bridge includes the Spring boot that provides a set of starter Pom’s build file, which includes an embedded Servlet Container.\
+The following command, shows how to go from an OpenAPI spec (![dataverse-bridge-api.yaml](dataverse-bridge-api.yaml)) to generated Spring Boot server stub.
 
 ```
 swagger-codegen generate -i dataverse-bridge-api.yaml -l spring -o . -c dataverse-bridge-config.json\
  --import-mappings Archiving=nl.knaw.dans.dataverse.bridge.service.db.domain.ArchivingAuditLog
 
 ```
+Every time you run the code generation tool, it will overwrite the code it had generated previously. 
+However, the generator tool offers a way of leaving certain files intact that is called .swagger-codegen-ignore file, which works just like a .gitignore file. 
 
 __.swagger-codegen-ignore__
 
 ```
+README.md
 pom.xml
 src/main/java/nl/knaw/dans/dataverse/bridge/service/*
 src/main/resources/application.properties
+
 ```
 
 #### Start the Bridge Appication
