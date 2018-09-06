@@ -4,8 +4,8 @@
 
 ## Overview
 
-The bridge service was developed in order to transfer datasets from a Dataverse instance to another Digital Archive Repository. At DANS, we will use the bridge to transfer datasets from DataverseNL to our long-term archive called EASY. The transfer is done by using the SWORD protocol (v2.0). 
-DANS created a plug-in for EASY, but it is possible to create other plug-ins for the bridge service in order to transfer datasets from Dataverse to a repository of your choice. 
+The bridge service was developed in order to transfer datasets from a Dataverse instance to another Digital Archive Repository. At [DANS](https://dans.knaw.nl), we will use the bridge to transfer datasets from [DataverseNL](https://dataverse.nl) to our long-term archive called [EASY](https://easy.dans.knaw.nl/ui/home). The transfer is done by using the [SWORD](http://swordapp.org/) protocol (v2.0). 
+[DANS](https://dans.knaw.nl) created a plug-in for [EASY](https://easy.dans.knaw.nl/ui/home), but it is possible to create other plug-ins for the bridge service in order to transfer datasets from Dataverse to a repository of your choice. 
 In the sections below more details are provided about:
 
 -	[Architecture](#bridge-architecture)
@@ -261,5 +261,7 @@ An example of *easy.json*
 ```
 
 ## <a name="bridge-plugin-easy">The EASY bridge plug-in
-, which is the implementation of bridge-plugin for ingesting data to EASY repository
+The [bridge-plugin-easy](https://github.com/ekoi/bridge-plugin-easy) is the implementation of bridge-plugin for ingesting data to [EASY](https://easy.dans.knaw.nl/ui/home) repository.
+This plugin, transform the Dataverse DDI metadata of the given persistent identifier to the EASY required xml files, those are dataset.xml and files.xml as describe on the '[Depositing in EASY with SWORD v2.0](https://easy.dans.knaw.nl/doc/sword2.html)' requirements document.
+
 
