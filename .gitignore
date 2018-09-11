@@ -18,6 +18,7 @@
 *.war
 *.ear
 *.zip
+!bridge-quickstart.zip
 *.tar.gz
 *.rar
 
