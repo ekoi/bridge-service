@@ -87,21 +87,19 @@ _Configuration_
 Create a group 'SWORD' (alias 'SWORD') in the dataverse root. Add the users that should have permission to transfer a dataset to this group.\
 It is not necessary to give this group permissions (a role) on any dataverse or dataset level. It is also not necessary to create a new role for this group.
 ## <a name="bridge-service-setting"></a>Setting up the bridge service
-There are two ways to set up the bridge service. You can use the Quick start option, or do it step by step.
+There are two ways to set up the bridge service. You can use the [Quick start](#bridge-service-quickstart) option, or do it [step by step](#bridge-service-fullstart).
 
-###### [Quick start](#bridge-service-quickstart)
+###### <a name="bridge-service-quickstart"></a>Quick start
+Download [bridge-quickstart](bridge-quickstart.zip), unzip it in a folder.\
+To start run on the terminal _start.sh_.\
+To shutdown, execute _shutdown.sh_ command.
 
 This [Quick start](#bridge-service-quickstart) shows how to deploy the dataverse bridge by using the default properties.
 
 ###### [Step by step](#bridge-service-fullstart)
 With this method you can generate the service step by step. This allows you to configure the service as you like (e.g. modificate the path, DAR target, port). 
 
-#### <a name="bridge-service-quickstart"></a>Quick start
-Download [bridge-quickstart](bridge-quickstart.zip), unzip it in a folder.\
-To start run on the terminal _start.sh_.\
-To shutdown, execute _shutdown.sh_ command.
-
-#### <a name="bridge-service-fullstart"></a>How to generate:
+###### <a name="bridge-service-fullstart"></a>How to generate:
 The dataverse bridge includes the Spring boot that provides a set of starter Pom’s build file, which includes an embedded Servlet Container.\
 The following command, shows how to go from an OpenAPI spec ([dataverse-bridge-api](dataverse-bridge-api.yaml)) to generated Spring Boot server stub.
 
