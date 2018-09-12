@@ -52,14 +52,16 @@ public class BridgeConfEnvironment implements EnvironmentAware {
         checkingRequiredProperties();
         checkingRequiredDirs();
         registerPlugins();
-        readTdrConfiguration();
+        readDarConfiguration();
         LOG.info("#                                                             #");
         LOG.info("###############################################################");
     }
 
     private void checkingRequiredProperties() {
+        LOG.info("Checking required properties....");
         List<String> requiredProperties = Arrays.asList("bridge.apps.support.email.from", "spring.mail.host", "bridge.apikey", "bridge.temp.dir.bags");
         requiredProperties.stream().forEach(x -> {
+            LOG.info("Property name: {}  value: {}", x, env.getProperty(x));
             if(env.getProperty(x) == null || env.getProperty(x).isEmpty()){
                 LOG.error("'{}' not found in the application-{}.properties.", x, activeProfile);
                 System.exit(1);
@@ -80,6 +82,7 @@ public class BridgeConfEnvironment implements EnvironmentAware {
         LOG.info("#                Check the required directories               #");
         List<String> requiredDirs = Arrays.asList("database", "config", "plugins", "dar-target-conf", env.getProperty("bridge.temp.dir.bags"));
         requiredDirs.forEach(dir -> {
+            LOG.info("Directory name: {}", dir);
             Path path = Paths.get(dir);
             if (!Files.exists(path)) {
                 try {
@@ -131,9 +134,9 @@ public class BridgeConfEnvironment implements EnvironmentAware {
         }
     }
 
-    private void readTdrConfiguration(){
+    private void readDarConfiguration(){
         LOG.info("#                                                             #");
-        LOG.info("#                Registering TDRs Configuration:              #");
+        LOG.info("#                Registering DAR's Configuration:              #");
         File darTargetConfBaseDir = new File("dar-target-conf");
         File darTargetConfFiles[] = darTargetConfBaseDir.listFiles(new FilenameFilter() {
             @Override
@@ -154,6 +157,7 @@ public class BridgeConfEnvironment implements EnvironmentAware {
                     JsonObject darTargetConfJson = reader.readObject();
                     reader.close();
                     darTarget.put(darTargetConfJson.getString("dar-name"), darTargetConfJson.getString("iri"));
+                    LOG.info("dar-name: {}\tiri: {}", darTargetConfJson.getString("dar-name"), darTargetConfJson.getString("iri"));
                 } catch (FileNotFoundException e) {
                     LOG.error("Fail to start the Bridge Service.....");
                     LOG.error("FileNotFoundException, cause by: " + e.getMessage());
