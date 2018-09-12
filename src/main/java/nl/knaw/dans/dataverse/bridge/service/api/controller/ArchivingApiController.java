@@ -138,8 +138,10 @@ public class ArchivingApiController implements ArchivingApi {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
-                    if (!darTarget.containsKey((ingestData.getDarData().getDarName())))
+                    if (!darTarget.containsKey((ingestData.getDarData().getDarName()))) {
+                        simpleEmail.sendToAdmin("DAR Target NOT FOUND", ingestData.getDarData().getDarName() + "not found!");
                         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    }
 
                     Optional<DarPluginConf> darPluginConf = darPluginConfList.stream().filter(x -> x.getDarName().equals(ingestData.getDarData().getDarName())).findAny();
                     if (darPluginConf.isPresent()) {
@@ -262,7 +264,9 @@ public class ArchivingApiController implements ArchivingApi {
                     String prevMsg = archivingAuditLog.getLog();
                     if (prevMsg != null)
                         msg = prevMsg + "|" + msg;
-                    simpleEmail.sendToAdmin("[doOnError]", msg);
+                    String subject =  "[doOnError] on id: " + archivingAuditLog.getId();
+                    msg += " \n srcMetadata: " + archivingAuditLog.getSrcMetadataXml() + " \nVersion: " + archivingAuditLog.getSrcMetadataVersion();
+                    simpleEmail.sendToAdmin(subject, msg);
                     archivingAuditLog.setLog(msg);
                     archivingAuditLog.setState(StateEnum.ERROR.toString());
                     archivingAuditLog.setEndTime(new Date());
@@ -274,8 +278,9 @@ public class ArchivingApiController implements ArchivingApi {
                     else
                         log.error("The response data is null.");
                 }, throwable -> {
-                    log.error("[throwable], msg: " + throwable.getCause().getMessage());
-                    simpleEmail.sendToAdmin("[throwable]", throwable.getCause().getMessage());
+                    String msg = "[throwable], msg: " + throwable.getMessage() + " \n srcMetadata: " + archivingAuditLog.getSrcMetadataXml() + " \nVersion: " + archivingAuditLog.getSrcMetadataVersion();
+                    log.error(msg);
+                    simpleEmail.sendToAdmin("[throwable] on id: " + archivingAuditLog.getId(), msg);
                 });
         return archivingAuditLog;
     }
