@@ -146,6 +146,7 @@ public class ArchivingApiController implements ArchivingApi {
                     Optional<DarPluginConf> darPluginConf = darPluginConfList.stream().filter(x -> x.getDarName().equals(ingestData.getDarData().getDarName())).findAny();
                     if (darPluginConf.isPresent()) {
                         String darIri = darTarget.get(ingestData.getDarData().getDarName());
+                        log.debug("darIri: " + darIri);
                         int statusCode = checkCredentials(darIri
                                 , ingestData.getDarData().getUsername()
                                 , ingestData.getDarData().getPassword()
@@ -223,7 +224,7 @@ public class ArchivingApiController implements ArchivingApi {
         URLClassLoader actionClassLoader = darPluginConf.getActionClassLoader();
         Class actionClass = Class.forName(darPluginConf.getActionClassName(), true, actionClassLoader);
         IAction action = (IAction)actionClass.newInstance();
-        log.info(action.toString());
+        log.info("action: " + action.toString());
         ArchivingAuditLog archivingAuditLog = createNewArchived(ingestData, darIri);
         Flowable.fromCallable(() -> {
             log.info("Starting process of ingest using Flowable.fromCallable()");
@@ -275,12 +276,17 @@ public class ArchivingApiController implements ArchivingApi {
                 .subscribe(erd -> {
                     if (erd != null)
                         saveAndClean(archivingAuditLog, erd);
-                    else
+                    else {
                         log.error("The response data is null.");
+                        simpleEmail.sendToAdmin("[FATAL ERROR]", "omething really wrong here!\nerd is null.");
+                    }
                 }, throwable -> {
                     String msg = "[throwable], msg: " + throwable.getMessage() + " \n srcMetadata: " + archivingAuditLog.getSrcMetadataXml() + " \nVersion: " + archivingAuditLog.getSrcMetadataVersion();
                     log.error(msg);
-                    simpleEmail.sendToAdmin("[throwable] on id: " + archivingAuditLog.getId(), msg);
+                    if (archivingAuditLog != null && archivingAuditLog.getId() != null)
+                        simpleEmail.sendToAdmin("[throwable] on id: " + archivingAuditLog.getId(), msg);
+                    else
+                        simpleEmail.sendToAdmin("[throwable]", msg);
                 });
         return archivingAuditLog;
     }
@@ -308,6 +314,8 @@ public class ArchivingApiController implements ArchivingApi {
                 log.warn(bagZipFileToDelete + " is not deleted");
             }
         } else {
+            log.error("Something wrong here, state:  " + erd.getState());
+            log.error(objectMapper.writeValueAsString(archivingAuditLog));
             simpleEmail.sendToAdmin(erd.getState(), objectMapper.writeValueAsString(archivingAuditLog));
         }
         archivingAuditlogDao.update(archivingAuditLog);
